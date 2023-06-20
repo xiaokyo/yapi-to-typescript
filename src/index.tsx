@@ -31,14 +31,22 @@ function flatObjects(data: any) {
     for (const key in properties) {
       const item = properties[key];
       if (item.type === "object") {
-        result[key] = flatObjects(item);
+        result[key] = {
+          type: formatType(item.type),
+          description: item?.description,
+          object: flatObjects(item),
+        };
       } else if (item.type === "array" && !item?.items.properties) {
         result[key] = {
           type: `${formatType(item?.items.type)}[]`,
           description: item?.description,
         };
       } else if (item.type === "array") {
-        result[key] = flatObjects(item.items);
+        result[key] = {
+          type: formatType(item.type),
+          description: item?.description,
+          object: flatObjects(item.items),
+        };
       } else {
         result[key] = {
           type: formatType(item.type),
@@ -56,24 +64,27 @@ function toTypescript(data: any, options?: { key?: string; value?: string }) {
   for (const key in data) {
     const item = data[key];
     const annotation = `/**
-     * ${item?.description || "TODO: 未知"}
-     * */`;
+        * ${item?.description || "TODO: 未知"}
+        * */`;
+
     if (options && options?.key?.trim() === key?.trim()) {
       result += `
       ${annotation}
       ${key}: ${options?.value};
       `;
     } else {
-      if (typeof item === "object" && Object.keys(item).length > 2) {
+      if (item?.type === "object" || item?.type === "array") {
+        const type = item.type;
+        const arraySuffix = type === "array" ? "[]" : "";
         result += `
-      ${annotation}
-      ${key}: { 
-        ${toTypescript(item, options)}
-      };`;
+        ${annotation}
+        ${key}: { 
+          ${toTypescript(item.object, options)}
+        }${arraySuffix};`;
       } else {
         result += `
-      ${annotation}
-      ${key}: ${item?.type || "string"};`;
+        ${annotation}
+        ${key}: ${item?.type || "string"};`;
       }
     }
   }
@@ -122,15 +133,16 @@ export default function Command(props: LaunchProps<{ arguments: IProps }>) {
     let typescript_list = "";
     let list_key_name = "";
     const jsonResBody = flatObjects(resBody);
-    resHasList = !!jsonResBody?.data?.records || !!jsonResBody?.data?.list || !!jsonResBody?.data?.content;
+    const jsonResBodyData = jsonResBody?.data?.object;
+    resHasList = jsonResBodyData?.records || jsonResBodyData?.list || !!jsonResBody?.data?.content;
     if (resHasList) {
       // 有列表值的情况
-      const list = jsonResBody?.data?.records || jsonResBody?.data?.list || jsonResBody?.data?.content;
-      list_key_name = jsonResBody?.data?.records
+      const list = jsonResBodyData?.records || jsonResBodyData?.list || jsonResBodyData?.content;
+      list_key_name = jsonResBodyData?.records
         ? "records"
-        : jsonResBody?.data?.list
+        : jsonResBodyData?.list
         ? "list"
-        : jsonResBody?.data?.content
+        : jsonResBodyData?.content
         ? "content"
         : "";
       typescript_list = `
@@ -138,7 +150,7 @@ export default function Command(props: LaunchProps<{ arguments: IProps }>) {
        * ${title}
        */
         export interface I${name}Item {
-          ${toTypescript(list)}
+          ${toTypescript(list.object)}
         }
       `;
     }
@@ -157,7 +169,7 @@ export default function Command(props: LaunchProps<{ arguments: IProps }>) {
      * 返回参数
      */
     export interface I${name}Response {
-      ${toTypescript(flatObjects(resBody), { key: list_key_name, value: `I${name}Item[]` })}
+      ${toTypescript(jsonResBody, { key: list_key_name, value: `I${name}Item[]` })}
     }
     `;
 
