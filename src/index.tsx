@@ -1,16 +1,20 @@
-import { Action, ActionPanel, Detail, LaunchProps, getPreferenceValues } from "@raycast/api";
+import { Action, ActionPanel, Detail, LaunchProps, getPreferenceValues, Toast, showToast } from "@raycast/api";
 import { useFetch } from "@raycast/utils";
 
 interface IProps {
   id: string;
 }
 
+interface Error {
+  message: string;
+}
+
 function safe_json_parse(str: string) {
   let result = null;
   try {
     result = JSON.parse(str);
-  } catch (err: any) {
-    result = { errmsg: err.message };
+  } catch (err: unknown) {
+    result = { errmsg: (err as Error).message };
   }
 
   return result;
@@ -58,13 +62,13 @@ function flatObjects(data: any) {
   return result;
 }
 
-/** 转成typescript字符 */
+/** transform to typescript interface */
 function toTypescript(data: any, options?: { key?: string; value?: string }) {
   let result = "";
   for (const key in data) {
     const item = data[key];
     const annotation = `/**
-        * ${item?.description || "TODO: 未知"}
+        * ${item?.description || "TODO: unknow"}
         * */`;
 
     if (options && options?.key?.trim() === key?.trim()) {
@@ -109,7 +113,7 @@ export default function Command(props: LaunchProps<{ arguments: IProps }>) {
     },
   });
 
-  let typeApis = ``;
+  let typescriptInterfaces = ``;
   let requestFun = ``;
 
   if (data?.data?.res_body) {
@@ -120,7 +124,7 @@ export default function Command(props: LaunchProps<{ arguments: IProps }>) {
     const paths = path?.split("/");
     const names: string[] = paths.map((_: string) => {
       const str = _;
-      // 首字母大写
+      // Capital case
       return str.charAt(0).toUpperCase() + str.slice(1);
     });
 
@@ -157,7 +161,7 @@ export default function Command(props: LaunchProps<{ arguments: IProps }>) {
 
     const typescript_request = `
     /**
-     * 请求参数
+     * Request Params
      */
     export interface I${name}Request {
       ${toTypescript(flatObjects(reqBody))}
@@ -166,19 +170,19 @@ export default function Command(props: LaunchProps<{ arguments: IProps }>) {
 
     const typescript_response = `
     /**
-     * 返回参数
+     * Response Data
      */
     export interface I${name}Response {
       ${toTypescript(jsonResBody, { key: list_key_name, value: `I${name}Item[]` })}
     }
     `;
 
-    typeApis = `
+    typescriptInterfaces = `
     /**
-     * 接口文档地址: ${yapiHost}/project/${project_id}/interface/api/${_id} 
+     * document: ${yapiHost}/project/${project_id}/interface/api/${_id} 
      * ${title}, ${String(method).toLocaleUpperCase()}
      * ${path}
-     * 后端: ${username}
+     * backend: ${username}
      */
     export interface I${name} {
       request: I${name}Request;
@@ -194,10 +198,10 @@ export default function Command(props: LaunchProps<{ arguments: IProps }>) {
 
     requestFun = `
     /**
-     * 接口文档地址: ${yapiHost}/project/${project_id}/interface/api/${_id} 
+     * document: ${yapiHost}/project/${project_id}/interface/api/${_id} 
      * ${title}, ${String(method).toLocaleUpperCase()}
      * ${path}
-     * 后端: ${username}
+     * backend: ${username}
      */
     request${name}(data: I${name}['request']): Promise<I${name}['response']> {
       return request('${path}', {
@@ -208,14 +212,18 @@ export default function Command(props: LaunchProps<{ arguments: IProps }>) {
     `;
   }
 
+  if (data?.errmsg && data?.errcode !== 0) {
+    showToast({ style: Toast.Style.Failure, title: "Something went wrong", message: data.errmsg });
+  }
+
   return (
     <Detail
       isLoading={isLoading}
-      markdown={typeApis || data?.errmsg || "获取详情失败"}
+      markdown={typescriptInterfaces || data?.errmsg}
       actions={
-        <ActionPanel title="复制到剪辑板">
-          <Action.CopyToClipboard title="复制Typescript" content={typeApis} />
-          <Action.CopyToClipboard title="复制Request" content={requestFun} />
+        <ActionPanel title="Copy Clipboard">
+          <Action.CopyToClipboard title="Copy Typescript" content={typescriptInterfaces} />
+          <Action.CopyToClipboard title="Copy Request" content={requestFun} />
         </ActionPanel>
       }
     />
