@@ -24,6 +24,27 @@
           "required": true
         }
       ]
+    },
+    {
+      "name": "genTypescriptInterfaceFiles",
+      "title": "YApi To Typescript Interface Files",
+      "subtitle": "Transform to Typescript Interfaces and Generator Files",
+      "description": "YApi's document transform to typescript interfaces and generator files",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "path",
+          "placeholder": "path",
+          "required": true,
+          "type": "text"
+        },
+        {
+          "name": "catId",
+          "placeholder": "catId",
+          "required": true,
+          "type": "text"
+        }
+      ]
     }
   ],
   "preferences": [
@@ -46,7 +67,8 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.53.4",
-    "@raycast/utils": "^1.8.0"
+    "@raycast/utils": "^1.8.0",
+    "axios": "^1.4.0"
   },
   "devDependencies": {
     "@raycast/eslint-config": "1.0.5",
