@@ -4,12 +4,13 @@ import { safe_json_parse, flatObjects, toTypescript } from ".";
 /**
  * transform to typescript interface
  */
-export default function handlerToInterface(data: any, yapiHost: string) {
+export default function handlerToInterface(data: any, yapiHost: string, prefix = "") {
   let typescriptInterfaces = ``;
   let requestFun = ``;
 
   if (data?.data?.res_body) {
-    const { title, method, path, project_id, _id, username, req_body_other, res_body } = data.data;
+    const { title, method, path: apiPath, project_id, _id, username, req_body_other, res_body } = data.data;
+    const path = prefix + apiPath;
     const reqBody = req_body_other ? safe_json_parse(req_body_other) : undefined;
     const resBody = res_body ? safe_json_parse(res_body) : undefined;
 

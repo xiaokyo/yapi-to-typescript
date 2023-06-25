@@ -7,13 +7,12 @@ import { useEffect, useState } from "react";
 interface IProps {
   path: string;
   catId: string;
+  apiPrefix: string;
 }
 
 async function Command(props: IProps) {
   try {
-    const { path: dir, catId = "21535" } = props;
-    // const dir = "/Users/xiaokyo/Documents/works/saas-order-center/src/pages/orderRiskControl";
-    // const catId = "21535";
+    const { path: dir, catId, apiPrefix = "" } = props;
     const preferences = getPreferenceValues<Preferences>();
     const { yapiHost } = preferences;
 
@@ -38,7 +37,7 @@ export default {
       const item = api_groups[i];
       const { tag, _id, title, path, project_id, uid, add_time } = item;
       const data = await axios(`/api/interface/get?id=${_id}`);
-      const { requestFun, typescriptInterfaces } = handlerToInterface(data.data, yapiHost);
+      const { requestFun, typescriptInterfaces } = handlerToInterface(data.data, yapiHost, apiPrefix);
 
       const apiName = path.split("/").pop();
       // frist letter to upper
@@ -71,10 +70,12 @@ export default function View() {
 
   const [catId, setCateId] = useState<string>("");
 
+  const [apiPrefix, setApiPrefix] = useState("");
+
   useEffect(() => {
     (async () => {
       const text = await Clipboard.readText();
-      text && setPathPlaceholder(text + "...");
+      text && setPathPlaceholder(text);
     })();
   }, []);
 
@@ -82,12 +83,22 @@ export default function View() {
     <Form
       actions={
         <ActionPanel title="Generator">
-          <Action title="Generator to Path" onAction={() => Command({ path: path || pathPlaceholder, catId: catId })} />
+          <Action
+            title="Generator to Path"
+            onAction={() => Command({ path: path || pathPlaceholder, catId: catId, apiPrefix })}
+          />
         </ActionPanel>
       }
     >
-      <Form.TextArea id="path" title="Path" placeholder={pathPlaceholder} value={path} onChange={setPath} />
+      <Form.TextArea id="path" title="Path" placeholder={`${pathPlaceholder}`} value={path} onChange={setPath} />
       <Form.TextField id="cateId" title="CateId" placeholder="YApi CateId" value={catId} onChange={setCateId} />
+      <Form.TextField
+        id="apiPrefix"
+        title="ApiPrefix"
+        placeholder="ApiPrefix"
+        value={apiPrefix}
+        onChange={setApiPrefix}
+      />
     </Form>
   );
 }
