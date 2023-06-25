@@ -95,7 +95,7 @@ export default function View() {
       <Form.TextField
         id="apiPrefix"
         title="ApiPrefix"
-        placeholder="ApiPrefix"
+        placeholder="like /api"
         value={apiPrefix}
         onChange={setApiPrefix}
       />
