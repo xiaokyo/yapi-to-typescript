@@ -82,7 +82,7 @@ export default function View() {
     <Form
       actions={
         <ActionPanel title="Generator">
-          <Action title="Generator to Path" onAction={() => Command({ path, catId: catId })} />
+          <Action title="Generator to Path" onAction={() => Command({ path: path || pathPlaceholder, catId: catId })} />
         </ActionPanel>
       }
     >
