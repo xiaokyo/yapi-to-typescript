@@ -1,16 +1,17 @@
-import { LaunchProps, Toast, getPreferenceValues, showToast } from "@raycast/api";
+import { Action, ActionPanel, Clipboard, Form, LaunchProps, Toast, getPreferenceValues, showToast } from "@raycast/api";
 import axios from "./utils/request";
 import handlerToInterface from "./utils/handleToInterface";
 import fs from "fs";
+import { useEffect, useState } from "react";
 
 interface IProps {
   path: string;
   catId: string;
 }
 
-export default async function Command(props: LaunchProps<{ arguments: IProps }>) {
+async function Command(props: IProps) {
   try {
-    const { path: dir, catId = "21535" } = props.arguments;
+    const { path: dir, catId = "21535" } = props;
     // const dir = "/Users/xiaokyo/Documents/works/saas-order-center/src/pages/orderRiskControl";
     // const catId = "21535";
     const preferences = getPreferenceValues<Preferences>();
@@ -62,4 +63,31 @@ export default {
       message: (err as { message: string }).message,
     });
   }
+}
+
+export default function View() {
+  const [path, setPath] = useState<string>("");
+  const [pathPlaceholder, setPathPlaceholder] = useState<string>("");
+
+  const [catId, setCateId] = useState<string>("");
+
+  useEffect(() => {
+    (async () => {
+      const text = await Clipboard.readText();
+      text && setPathPlaceholder(text + "...");
+    })();
+  }, []);
+
+  return (
+    <Form
+      actions={
+        <ActionPanel title="Generator">
+          <Action title="Generator to Path" onAction={() => Command({ path, catId: catId })} />
+        </ActionPanel>
+      }
+    >
+      <Form.TextArea id="path" title="Path" placeholder={pathPlaceholder} value={path} onChange={setPath} />
+      <Form.TextField id="cateId" title="CateId" placeholder="YApi CateId" value={catId} onChange={setCateId} />
+    </Form>
+  );
 }

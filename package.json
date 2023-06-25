@@ -30,21 +30,7 @@
       "title": "YApi To Typescript Interface Files",
       "subtitle": "Transform to Typescript Interfaces and Generator Files",
       "description": "YApi's document transform to typescript interfaces and generator files",
-      "mode": "no-view",
-      "arguments": [
-        {
-          "name": "path",
-          "placeholder": "path",
-          "required": true,
-          "type": "text"
-        },
-        {
-          "name": "catId",
-          "placeholder": "catId",
-          "required": true,
-          "type": "text"
-        }
-      ]
+      "mode": "view"
     }
   ],
   "preferences": [
