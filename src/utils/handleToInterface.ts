@@ -1,5 +1,6 @@
 import { Toast, showToast } from "@raycast/api";
 import { safe_json_parse, flatObjects, toTypescript } from ".";
+import * as prettier from "prettier";
 
 /**
  * transform to typescript interface
@@ -93,7 +94,7 @@ export default function handlerToInterface(data: any, yapiHost: string, prefix =
    * backend: ${username}
    */
   request${name}(
-    data: I${name}['request'],
+    data: I${name}['request']
   ): Promise<I${name}['response']> {
     return request('${path}', {
       method: '${String(method).toLocaleUpperCase()}',
@@ -106,8 +107,15 @@ export default function handlerToInterface(data: any, yapiHost: string, prefix =
     showToast({ style: Toast.Style.Failure, title: "Something went wrong", message: data.errmsg });
   }
 
+  const typescriptInterfacesPrettier = prettier.format(typescriptInterfaces, {
+    parser: "typescript",
+    singleQuote: true,
+    trailingComma: "all",
+    printWidth: 80,
+  });
+
   return {
     requestFun,
-    typescriptInterfaces,
+    typescriptInterfaces: typescriptInterfacesPrettier,
   };
 }

@@ -1,8 +1,9 @@
-import { Action, ActionPanel, Clipboard, Form, LaunchProps, Toast, getPreferenceValues, showToast } from "@raycast/api";
+import { Action, ActionPanel, Clipboard, Form, Toast, getPreferenceValues, showToast } from "@raycast/api";
 import axios from "./utils/request";
 import handlerToInterface from "./utils/handleToInterface";
 import fs from "fs";
 import { useEffect, useState } from "react";
+import * as prettier from "prettier";
 
 interface IProps {
   path: string;
@@ -52,7 +53,15 @@ export default {
 
     const services_ts_str = services_ts(request_funs, imports)?.trim();
 
-    fs.writeFileSync(`${dir}/services/index.ts`, services_ts_str);
+    fs.writeFileSync(
+      `${dir}/services/index.ts`,
+      prettier.format(services_ts_str, {
+        parser: "typescript",
+        singleQuote: true,
+        trailingComma: "all",
+        printWidth: 80,
+      })
+    );
 
     showToast({ style: Toast.Style.Success, title: "Success", message: "Write services successfully" });
   } catch (err) {
