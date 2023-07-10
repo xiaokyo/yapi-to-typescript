@@ -70,6 +70,7 @@ export function toTypescript(data: any, options?: { key?: string; value?: string
         ${key}: ${options?.value};
         `;
     } else {
+      console.log("%c输出:", "color: #007acc;", item?.type, key);
       if (item?.type === "object" || item?.type === "array") {
         const type = item.type;
         const arraySuffix = type === "array" ? "[]" : "";
@@ -83,11 +84,17 @@ export function toTypescript(data: any, options?: { key?: string; value?: string
           ${annotation}
           ${key}: ${value}${arraySuffix};`;
       } else {
+        let type = isUndefinedStr(item.type) ? "any" : item.type;
+        if (item?.type?.indexOf("[]") > -1) type += "[]";
         result += `
           ${annotation}
-          ${key}: ${item?.type || "string"};`;
+          ${key}: ${type || "string"};`;
       }
     }
   }
   return result;
+}
+
+function isUndefinedStr(str: string) {
+  return str.indexOf("undefined") > -1;
 }
