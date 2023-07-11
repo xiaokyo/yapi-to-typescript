@@ -78,7 +78,7 @@ export function toTypescript(data: any, options?: { key?: string; value?: string
           ${key}: ${value}${arraySuffix};`;
       } else {
         let type = isUndefinedStr(item.type) ? "any" : item.type;
-        if (item?.type?.includes("[]")) type += "[]";
+        if (item?.type?.includes("[]") && !String(type).includes('[]')) type += "[]";
         result += `
           ${annotation}
           ${key}: ${type || "string"};`;
