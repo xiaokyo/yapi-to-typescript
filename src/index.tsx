@@ -39,7 +39,7 @@ const useInterfaceContent = (data: any, yapiHost: string) => {
         showToast({ style: Toast.Style.Failure, title: "Parse Error", message: (err as unknown as any).message });
       }
     })();
-  }, []);
+  }, [data]);
 
   return {
     typescriptInterfaces,
@@ -60,7 +60,7 @@ export default function Command(props: LaunchProps<{ arguments: IProps }>) {
   });
 
   const { typescriptInterfaces, requestFun, isLoading: parseLoading } = useInterfaceContent(data, yapiHost);
-
+  
   return (
     <Detail
       isLoading={isLoading || parseLoading}
