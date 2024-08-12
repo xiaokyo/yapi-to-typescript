@@ -75,14 +75,15 @@ export default function handlerToInterface(data: any, yapiHost: string, prefix =
      * ${path}
      * backend: ${username}
      */
-    export interface I${name} {
-      request: I${name}Request;
-      response: I${name}Response;
-    }
 
     ${typescript_request}
 
     ${typescript_response}
+    
+    export interface I${name} {
+      request: I${name}Request;
+      response: I${name}Response;
+    }
 
     ${typescript_list}`;
 
