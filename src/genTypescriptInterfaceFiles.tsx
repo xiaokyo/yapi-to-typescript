@@ -40,6 +40,14 @@ export default {
       const data = await axios(`/api/interface/get?id=${_id}`);
       const { requestFun, typescriptInterfaces } = handlerToInterface(data.data, yapiHost, apiPrefix);
 
+      if (
+        requestFun?.indexOf("废弃") > -1 ||
+        requestFun?.indexOf("deprecated") > -1 ||
+        typescriptInterfaces.indexOf("废弃") > -1 ||
+        typescriptInterfaces.indexOf("deprecated") > -1
+      )
+        continue;
+
       const apiName = path.split("/").pop();
       // frist letter to upper
       const importName = "I" + apiName.charAt(0).toUpperCase() + apiName.slice(1);
