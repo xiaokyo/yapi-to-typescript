@@ -89,5 +89,5 @@ export function toTypescript(data: any, options?: { key?: string; value?: string
 }
 
 function isUndefinedStr(str: string) {
-  return str?.includes("undefined");
+  return str?.includes("undefined") || str?.includes("null");
 }
