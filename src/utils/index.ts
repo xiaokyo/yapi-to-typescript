@@ -59,7 +59,7 @@ export function toTypescript(data: any, options?: { key?: string; value?: string
   for (const key in data || {}) {
     const item = data[key];
     const annotation = `/**
-          * ${item?.description || "TODO: unknow"}
+          * ${item?.description || "后端未设置备注: unknow"}
           * */`;
 
     if (options?.key?.trim() === key?.trim()) {
@@ -68,14 +68,15 @@ export function toTypescript(data: any, options?: { key?: string; value?: string
         ${key}: ${options.value};
         `;
     } else {
-      console.log("%c输出:", "color: #007acc;", item?.type, key);
       if (item?.type === "object" || item?.type === "array") {
         const type = item.type;
-        const arraySuffix = type === "array" ? "[]" : "";
-        const value = Object.keys(item.object || {}).length > 0 ? `{ ${toTypescript(item.object, options)} }` : "any";
+        let value = Object.keys(item.object || {}).length > 0 ? `{ ${toTypescript(item.object, options)} }` : "any";
+        if (type === "array") {
+          value = `Array<${value}>`
+        }
         result += `
           ${annotation}
-          ${key}: ${value}${arraySuffix};`;
+          ${key}: ${value};`;
       } else {
         let type = isUndefinedStr(item.type) ? "any" : item.type;
         if (item?.type?.includes("[]") && !String(type).includes('[]')) type += "[]";
