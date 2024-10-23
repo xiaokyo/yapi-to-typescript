@@ -1,16 +1,7 @@
-import {
-  Action,
-  ActionPanel,
-  Clipboard,
-  Detail,
-  LaunchProps,
-  Toast,
-  getPreferenceValues,
-  showToast,
-} from "@raycast/api";
-import { useFetch } from "@raycast/utils";
+import { Action, ActionPanel, Detail, LaunchProps, Toast, getPreferenceValues, showToast } from "@raycast/api";
 import handlerToInterface from "./utils/handleToInterface";
 import { useEffect, useState } from "react";
+import axios, { login } from "./utils/request";
 
 interface IProps {
   id: string;
@@ -20,7 +11,7 @@ interface Preferences {
   /** yapi host */
   yapiHost: string;
   /** yapi cookie */
-  yapiCookie: string;
+  // yapiCookie: string;
 }
 
 const useInterfaceContent = (data: any, yapiHost: string) => {
@@ -51,16 +42,29 @@ const useInterfaceContent = (data: any, yapiHost: string) => {
 export default function Command(props: LaunchProps<{ arguments: IProps }>) {
   const { id } = props.arguments;
   const preferences = getPreferenceValues<Preferences>();
-  const { yapiHost, yapiCookie } = preferences;
-  const { isLoading, data }: any = useFetch(`${yapiHost}/api/interface/get?id=${id}`, {
-    headers: {
-      "Content-Type": "application/json",
-      cookie: yapiCookie,
-    },
-  });
+  const { yapiHost } = preferences;
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    login().then((newCookie) => {
+      axios({
+        url: `/api/interface/get?id=${id}`,
+        method: "GET",
+        headers: {
+          cookie: newCookie,
+        },
+      }).then((data) => {
+        setData(data?.data);
+        setIsLoading(false);
+      });
+    });
+  }, []);
 
   const { typescriptInterfaces, requestFun, isLoading: parseLoading } = useInterfaceContent(data, yapiHost);
-  
+
   return (
     <Detail
       isLoading={isLoading || parseLoading}

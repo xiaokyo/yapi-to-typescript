@@ -41,14 +41,6 @@
       "required": true,
       "placeholder": "YApi Host",
       "title": "YApi Host"
-    },
-    {
-      "name": "yapiCookie",
-      "description": "YApi Cookie",
-      "type": "textfield",
-      "required": true,
-      "placeholder": "YApi Cookie",
-      "title": "YApi Cookie"
     }
   ],
   "dependencies": {

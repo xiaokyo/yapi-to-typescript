@@ -1,5 +1,5 @@
 import { Action, ActionPanel, Clipboard, Form, Toast, getPreferenceValues, showToast } from "@raycast/api";
-import axios from "./utils/request";
+import axios, { login } from "./utils/request";
 import handlerToInterface from "./utils/handleToInterface";
 import fs from "fs";
 import { useEffect, useState } from "react";
@@ -16,8 +16,10 @@ async function Command(props: IProps) {
     const { path: dir, catId, apiPrefix = "" } = props;
     const preferences = getPreferenceValues<Preferences>();
     const { yapiHost } = preferences;
-
-    const group_list_response = await axios(`/api/interface/list_cat?page=1&limit=100&catid=${catId}`);
+    const newCookie = await login();
+    const group_list_response = await axios(`/api/interface/list_cat?page=1&limit=100&catid=${catId}`, {
+      headers: { cookie: newCookie },
+    });
 
     const {
       data: { list: api_groups = [] },
@@ -37,7 +39,7 @@ export default {
     for (let i = 0; i < api_groups.length; i++) {
       const item = api_groups[i];
       const { tag, _id, title, path, project_id, uid, add_time } = item;
-      const data = await axios(`/api/interface/get?id=${_id}`);
+      const data = await axios(`/api/interface/get?id=${_id}`, { headers: { cookie: newCookie } });
       const { requestFun, typescriptInterfaces } = handlerToInterface(data.data, yapiHost, apiPrefix);
 
       if (
