@@ -97,7 +97,8 @@ export default function handlerToInterface(data: any, yapiHost: string, prefix =
   request${name}(
     data: I${name}['request']
   ): Promise<I${name}['response']> {
-    return request('${path}', {
+    return request({
+      url: '${path}',
       method: '${String(method).toLocaleUpperCase()}',
       data,
     });
