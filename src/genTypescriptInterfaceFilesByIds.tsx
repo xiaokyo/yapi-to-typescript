@@ -63,7 +63,6 @@ function readIdsFromFile(dirPath: string): MDItem[] {
 
     // 使用readLineGetIds提取IDs
     const ids = readLineGetIds(fileContent);
-    console.log("%csrc/genTypescriptInterfaceFilesByIds.tsx:55 ids", "color: #007acc;", ids);
     showToast({
       style: Toast.Style.Success,
       title: "文件读取成功",
@@ -125,10 +124,19 @@ export default {
       imports.push(`import { ${importName} } from '${importPath}';`);
       request_funs.push(requestFun);
 
+      // types folder not exists, create it
+      if (!fs.existsSync(`${dir}/types`)) {
+        fs.mkdirSync(`${dir}/types`);
+      }
       fs.writeFileSync(`${dir}/types/${apiName}.ts`, typescriptInterfaces);
     }
 
     const services_ts_str = services_ts(request_funs, imports)?.trim();
+
+    // services folder not exists, create it
+    if (!fs.existsSync(`${dir}/services`)) {
+      fs.mkdirSync(`${dir}/services`);
+    }
 
     fs.writeFileSync(
       `${dir}/services/index.ts`,
