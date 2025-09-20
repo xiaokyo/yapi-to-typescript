@@ -65,7 +65,7 @@ export function toTypescript(data: any, options?: { key?: string; value?: string
     if (options?.key?.trim() === key?.trim()) {
       result += `
         ${annotation}
-        ${key}: ${options.value};
+        "${key}": ${options.value};
         `;
     } else {
       if (item?.type === "object" || item?.type === "array") {
@@ -76,13 +76,13 @@ export function toTypescript(data: any, options?: { key?: string; value?: string
         }
         result += `
           ${annotation}
-          ${key}: ${value};`;
+          "${key}": ${value};`;
       } else {
         let type = isUndefinedStr(item.type) ? "any" : item.type;
         if (item?.type?.includes("[]") && !String(type).includes('[]')) type += "[]";
         result += `
           ${annotation}
-          ${key}: ${type || "string"};`;
+          "${key}": ${type || "string"};`;
       }
     }
   }

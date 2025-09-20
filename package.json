@@ -31,6 +31,13 @@
       "subtitle": "Transform to Typescript Interfaces and Generator Files",
       "description": "YApi's document transform to typescript interfaces and generator files",
       "mode": "view"
+    },
+    {
+      "name": "genTypescriptInterfaceFilesByIds",
+      "title": "YApi To Typescript Interface Files By Ids",
+      "subtitle": "Transform to Typescript Interfaces and Generator Files",
+      "description": "YApi's document transform to typescript interfaces and generator files",
+      "mode": "view"
     }
   ],
   "preferences": [

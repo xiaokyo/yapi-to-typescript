@@ -8,7 +8,7 @@ import * as prettier from "prettier";
 export default function handlerToInterface(data: any, yapiHost: string, prefix = "") {
   let typescriptInterfaces = ``;
   let requestFun = ``;
-
+  let name = "";
   if (data?.data?.res_body) {
     const { title, method, path: apiPath, project_id, _id, username, req_body_other, res_body } = data.data;
     const path = prefix + apiPath;
@@ -22,7 +22,7 @@ export default function handlerToInterface(data: any, yapiHost: string, prefix =
       return str.charAt(0).toUpperCase() + str.slice(1);
     });
 
-    let name = names[names.length - 1];
+    name = names[names.length - 1];
     if (names[names.length - 1]?.length < 5) {
       name = names.filter((_, i) => i > names.length - 2).join("");
     }
@@ -117,6 +117,7 @@ export default function handlerToInterface(data: any, yapiHost: string, prefix =
   });
 
   return {
+    name,
     requestFun,
     typescriptInterfaces: typescriptInterfacesPrettier,
   };
